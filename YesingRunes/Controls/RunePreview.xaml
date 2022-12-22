@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="YesingRunes.Controls.RunePreview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:YesingRunes.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <!--temp color, idk how the style is gonna be like yet-->
+    <Button Height="200" Click="Button_Click" Background="DarkCyan">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="Hello how are you see this?! ¯\_(ツ)_/¯" FontSize="20" x:Name="NameTextBlock"/>
+            <Image Width="150" Name="ChampImage"/>
+        </StackPanel>
+    </Button>
+</UserControl>
