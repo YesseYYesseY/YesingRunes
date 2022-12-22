@@ -72,22 +72,27 @@ namespace YesingRunes
             if(sndr is not null)
             {
                 sndr.IsEnabled = false;
+                var Selected = LangCombo.SelectedItem as TextBlock;
 
-                Process buildTools = new Process()
+                if (Selected is not null)
                 {
-                    StartInfo = new ProcessStartInfo()
+                    Process buildTools = new Process()
                     {
-                        FileName = Directory.GetCurrentDirectory() + "./BuildTools.exe",
-                        CreateNoWindow = true,
-                        ArgumentList = {
-                            (LangCombo.SelectedItem as TextBlock).Name
+                        StartInfo = new ProcessStartInfo()
+                        {
+                            FileName = Directory.GetCurrentDirectory() + "./BuildTools.exe",
+                            CreateNoWindow = true,
+                            ArgumentList = {
+                                (Selected).Name
+                            }
                         }
-                    }
-                };
+                    };
 
-                buildTools.Start();
-                buildTools.WaitForExit();
-                this.Close();
+                    buildTools.Start();
+                    buildTools.WaitForExit();
+                    this.Close();
+                }
+
             }
         }
 

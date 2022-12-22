@@ -1,10 +1,13 @@
-﻿using System;
+﻿using PoniLCU;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using YesingRunes.Models;
 
 namespace YesingRunes
 {
@@ -14,6 +17,7 @@ namespace YesingRunes
         //     int = PathID
         //     List<int> RuneIDS
         // >
+        public static LeagueClient LCUClient;
         public static Dictionary<int, List<int>> RunePaths = new Dictionary<int, List<int>>();
         public static Dictionary<string, string> TranslateLang = new Dictionary<string, string>()
         {
@@ -49,7 +53,27 @@ namespace YesingRunes
 
         public static void Init()
         {
-            
+            LCUClient = new LeagueClient(LeagueClient.credentials.lockfile);
+        }
+
+        public static void EquipPage()
+        {
+            var res = LCUClient.Request(LeagueClient.requestMethod.POST, "").Result;
+            if(res.StartsWith("{\"errorCode\":\""))
+            {
+                if(res.Contains("Max pages reached"))
+                {
+                    var current = LCUClient.Request(LeagueClient.requestMethod.GET, "/lol-perks/v1/currentpage").Result;
+                    var currentjson = JsonSerializer.Deserialize<RiotRunePage>(current);
+
+                    LCUClient.Request(LeagueClient.requestMethod.DELETE, $"/lol-perks/v1/pages/{currentjson.id}");
+                    res = LCUClient.Request(LeagueClient.requestMethod.POST, "").Result;
+                    if(res.StartsWith("{\"errorCode\":\""))
+                    {
+                        throw new Exception("ur doomed lol");
+                    }
+                }
+            }
         }
     }
 }

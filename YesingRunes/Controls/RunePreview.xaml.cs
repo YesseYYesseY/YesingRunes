@@ -42,5 +42,27 @@ namespace YesingRunes.Controls
         {
 
         }
+
+        private void Grid_MouseEnter(object sender, MouseEventArgs e)
+        {
+            EditButton.Visibility = Visibility.Visible;
+            EquipButton.Visibility = Visibility.Visible;
+        }
+
+        private void Grid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            EditButton.Visibility = Visibility.Hidden;
+            EquipButton.Visibility = Visibility.Hidden;
+        }
+
+        private void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void EquipButton_Click(object sender, RoutedEventArgs e)
+        {
+            Utils.EquipPage();
+        }
     }
 }

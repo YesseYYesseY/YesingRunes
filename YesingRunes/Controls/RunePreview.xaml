@@ -7,10 +7,33 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <!--temp color, idk how the style is gonna be like yet-->
-    <Button Height="200" Click="Button_Click" Background="DarkCyan">
-        <StackPanel Orientation="Vertical">
-            <TextBlock Text="Hello how are you see this?! ¯\_(ツ)_/¯" FontSize="20" x:Name="NameTextBlock"/>
-            <Image Width="150" Name="ChampImage"/>
-        </StackPanel>
-    </Button>
+    <Grid MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Button HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Height="200" Click="Button_Click" Background="DarkCyan" Grid.ColumnSpan="3">
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Image Width="150" Name="ChampImage"/>
+                <TextBlock Text="Hello how are you see this?! ¯\_(ツ)_/¯" VerticalAlignment="Center" FontSize="20" x:Name="NameTextBlock" Margin="5"/>
+            </StackPanel>
+        </Button>
+        <Button Height="100" Width="100" Grid.Column="2" Visibility="Hidden" FontSize="20" x:Name="EditButton" Click="EditButton_Click">
+            Edit
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="40"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+        <Button Height="100" Width="100" Grid.Column="1" Visibility="Hidden" FontSize="20" x:Name="EquipButton" Click="EquipButton_Click">
+            Equip
+            <Button.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="40"/>
+                </Style>
+            </Button.Resources>
+        </Button>
+    </Grid>
 </UserControl>
