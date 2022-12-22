@@ -12,4 +12,8 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\YesingRunes.Models\YesingRunes.Models.csproj" />
+  </ItemGroup>
+
 </Project>

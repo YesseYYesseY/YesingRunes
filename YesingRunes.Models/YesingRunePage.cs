@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace YesingRunes.Models
+﻿namespace YesingRunes.Models
 {
     public struct YesingRunePage
     {
@@ -13,5 +7,4 @@ namespace YesingRunes.Models
         public int PrimaryRunePath { get; set; }
         public int SecondaryRunePath { get; set; }
     }
-
 }

@@ -1,8 +1,16 @@
 ﻿using System.Text.Json;
+using YesingRunes.Models;
 
 const string DateFormat = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
 
 Directory.CreateDirectory("./Data/Images/Champs/");
+
+string lang = "en_US";
+
+if(args.Length > 0)
+{
+    lang = args[0];
+}
 
 using (var client = new HttpClient())
 {
@@ -20,7 +28,8 @@ using (var client = new HttpClient())
     File.Create("./Data/version.json").Close();
     File.WriteAllText("./Data/version.json", version);
 
-    if (!client.DownloadFile($"http://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/champion.json", "./Data/champion.json")) throw new FileNotFoundException("./Data/champion.json does not exist!");
+    if (!client.DownloadFile($"http://ddragon.leagueoflegends.com/cdn/{version}/data/{lang}/champion.json", "./Data/champion.json")) throw new FileNotFoundException("./Data/champion.json does not exist!");
+    if (!client.DownloadFile($"http://ddragon.leagueoflegends.com/cdn/{version}/data/{lang}/runesReforged.json", "./Data/runes.json")) throw new FileNotFoundException("./Data/runes.json does not exist!");
 
     var championjson = JsonSerializer.Deserialize<OuterChampion>(File.ReadAllText("./Data/champion.json"));
     Dictionary<string, string> downloads = new Dictionary<string, string>();
@@ -118,70 +127,4 @@ public static class Extensions
             task.Wait();
         }
     }
-}
-
-struct ChampionStats
-{
-    public float hp{ get; set; }
-    public float hpperlevel{ get; set; }
-    public float mp{ get; set; }
-    public float mpperlevel{ get; set; }
-    public float movespeed{ get; set; }
-    public float armor{ get; set; }
-    public float armorperlevel{ get; set; }
-    public float spellblock{ get; set; }
-    public float spellblockperlevel{ get; set; }
-    public float attackrange{ get; set; }
-    public float hpregen{ get; set; }
-    public float hpregenperlevel{ get; set; }
-    public float mpregen{ get; set; }
-    public float mpregenperlevel{ get; set; }
-    public float crit{ get; set; }
-    public float critperlevel{ get; set; }
-    public float attackdamage{ get; set; }
-    public float attackdamageperlevel{ get; set; }
-    public float attackspeedperlevel{ get; set; }
-    public float attackspeed{ get; set; }
-}
-
-struct ChampionImage
-{
-    public string full{ get; set; }
-    public string sprite{ get; set; }
-    public string group{ get; set; }
-    public int x{ get; set; }
-    public int y{ get; set; }
-    public int w{ get; set; }
-    public int h{ get; set; }
-}
-
-struct ChampionInfo
-{
-    public int attack{ get; set; }
-    public int defense{ get; set; }
-    public int magic{ get; set; }
-    public int difficulty{ get; set; }
-}
-
-struct InnerChampion
-{
-    public string version{ get; set; }
-    public string id{ get; set; }
-    public string key{ get; set; }
-    public string name{ get; set; }
-    public string title{ get; set; }
-    public string blurb{ get; set; }
-    public ChampionInfo info{ get; set; }
-    public ChampionImage image{ get; set; }
-    public List<string> tags{ get; set; }
-    public string partype{ get; set; }
-    public ChampionStats stats{ get; set; }
-}
-
-struct OuterChampion
-{
-    public string type { get; set; }
-    public string format { get; set; }
-    public string version { get; set; }
-    public Dictionary<string, InnerChampion> data { get; set; }
 }

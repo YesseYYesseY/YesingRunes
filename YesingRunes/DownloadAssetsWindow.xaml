@@ -1,0 +1,22 @@
+﻿<Window x:Class="YesingRunes.DownloadAssetsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:YesingRunes"
+        mc:Ignorable="d"
+        Title="DownloadAssetsWindow" Height="450" Width="800">
+    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="A new update of League of Legends has been detected!" Name="UpdateText" FontSize="20"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Text="Do you want to update to version " FontSize="20"/>
+            <TextBlock Text="12.23.1" FontSize="20" Name="VersionText"/>
+            <TextBlock Text="?" FontSize="20"/>
+        </StackPanel>
+        <ComboBox Margin="5" Height="50" Name="LangCombo" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" SelectedIndex="0"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="Yes" FontSize="20" Width="150" Height="50" Margin="5" Name="AcceptButton" Click="AcceptButton_Click"/>
+            <Button Content="No" FontSize="20" Width="150" Height="50" Margin="5" Name="DeclineButton" Click="DeclineButton_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
