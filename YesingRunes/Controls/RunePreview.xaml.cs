@@ -30,7 +30,7 @@ namespace YesingRunes.Controls
             InitializeComponent();
 
             NameTextBlock.Text = runePage.Name;
-            var uri = new Uri(Directory.GetCurrentDirectory() + "./Images/Champs/Aatrox.png"); // This for some reason is needed?, also Directory.GetCurrentDirectory() is needed because base dir is System32 or smthn
+            var uri = new Uri(Directory.GetCurrentDirectory() + "./Data/Images/Champs/Aatrox.png"); // This for some reason is needed?, also Directory.GetCurrentDirectory() is needed because base dir is System32 or smthn
             ChampImage.Source = new BitmapImage(uri);
         }
         public RunePreview()
