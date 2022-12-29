@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -23,6 +24,8 @@ namespace YesingRunes
     /// </summary>
     public partial class DownloadAssetsWindow : Window
     {
+        bool firstSetup = false;
+        public bool DownloadLCURunes = false;
         public DownloadAssetsWindow()
         {
             InitializeComponent();
@@ -34,13 +37,17 @@ namespace YesingRunes
             InitializeComponent();
 
             LoadLangs();
+            firstSetup = forcedYes;
             if(forcedYes)
             {
-                DeclineButton.IsEnabled = false;
-
-                UpdateText.Text = "Do you want to download the latest data from League of Legends? (Required to useYesingRunes)";
+                UpdateText.Text = "First time YesingRunes setup";
+                QuestionBlock.Text = "Do you want to import the rune pages you currently have on your league account?";
+                VersionText.Text = "";
             }
-            VersionText.Text = newVersion;
+            else
+            {
+                VersionText.Text = newVersion;
+            }
         }
 
         void LoadLangs()
@@ -66,6 +73,25 @@ namespace YesingRunes
             }
         }
 
+        void RunBuildTools(string lang)
+        {
+
+            Process buildTools = new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = Directory.GetCurrentDirectory() + "./BuildTools.exe",
+                    CreateNoWindow = true,
+                    ArgumentList = {
+                        lang
+                    }
+                }
+            };
+
+            buildTools.Start();
+            buildTools.WaitForExit();
+        }
+
         private void AcceptButton_Click(object sender, RoutedEventArgs e)
         {
             var sndr = sender as Button;
@@ -76,29 +102,33 @@ namespace YesingRunes
 
                 if (Selected is not null)
                 {
-                    Process buildTools = new Process()
+                    RunBuildTools(Selected.Name);
+                    if(firstSetup)
                     {
-                        StartInfo = new ProcessStartInfo()
-                        {
-                            FileName = Directory.GetCurrentDirectory() + "./BuildTools.exe",
-                            CreateNoWindow = true,
-                            ArgumentList = {
-                                (Selected).Name
-                            }
-                        }
-                    };
-
-                    buildTools.Start();
-                    buildTools.WaitForExit();
-                    this.Close();
+                        DownloadLCURunes = true;
+                    }
                 }
-
             }
+            Close();
         }
 
         private void DeclineButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            if(firstSetup)
+            {
+                var sndr = sender as Button;
+                if (sndr is not null)
+                {
+                    sndr.IsEnabled = false;
+                    var Selected = LangCombo.SelectedItem as TextBlock;
+
+                    if (Selected is not null)
+                    {
+                        RunBuildTools(Selected.Name);
+                    }
+                }
+            }
+            Close();
         }
     }
 }

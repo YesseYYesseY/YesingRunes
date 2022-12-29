@@ -42,7 +42,16 @@ namespace YesingRunes.Models
 		public string name { get; set; }
 		public int order { get; set; }
 		public int primaryStyleId { get; set; }
-		public int selectedPerkIds { get; set; }
+		public int[] selectedPerkIds { get; set; }
 		public int subStyleId { get; set; }
+
+		public YesingRunePage Yesified => new YesingRunePage()
+		{
+			Name= name,
+			CurrentRunes = selectedPerkIds.ToList(),
+			PrimaryRunePath = primaryStyleId,
+			SecondaryRunePath = subStyleId,
+			PageID = id
+		};
     }
 }

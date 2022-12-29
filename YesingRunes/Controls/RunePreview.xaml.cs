@@ -57,12 +57,12 @@ namespace YesingRunes.Controls
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            new RuneEditor(RunePage).ShowDialog();
         }
 
         private void EquipButton_Click(object sender, RoutedEventArgs e)
         {
-            Utils.EquipPage();
+            Utils.EquipPage(RunePage);
         }
     }
 }

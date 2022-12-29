@@ -1,6 +1,7 @@
 ﻿using PoniLCU;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -11,6 +12,11 @@ using YesingRunes.Models;
 
 namespace YesingRunes
 {
+    public struct TranslationStruct
+    {
+        public string name { get; set; }
+        public string description { get; set; }
+    }
     public static class Utils
     {
         // Dictionary <
@@ -18,7 +24,7 @@ namespace YesingRunes
         //     List<int> RuneIDS
         // >
         public static LeagueClient LCUClient;
-        public static Dictionary<int, List<int>> RunePaths = new Dictionary<int, List<int>>();
+        public static List<RiotRunePath> RunePaths = new List<RiotRunePath>();
         public static Dictionary<string, string> TranslateLang = new Dictionary<string, string>()
         {
             { "cs_CZ",   "Czech (Czech Republic)"  },
@@ -51,14 +57,38 @@ namespace YesingRunes
             { "zh_TW",   "Chinese (Taiwan)" },
         };
 
+        public static Dictionary<int, TranslationStruct> runeTranslation = new Dictionary<int, TranslationStruct>();
+
+        public static List<YesingRunePage> runePages = new List<YesingRunePage>();
+
+        public static string LocalAppdata => $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/YesingRunes";
+
         public static void Init()
         {
             LCUClient = new LeagueClient(LeagueClient.credentials.lockfile);
+
+            var rnpt = JsonSerializer.Deserialize<List<RiotRunePath>>(File.ReadAllText("./Data/runes.json"));
+            if (rnpt is not null)
+            {
+                RunePaths = rnpt;
+            }
+
+            var statmods = JsonSerializer.Deserialize<Dictionary<string, TranslationStruct>>(File.ReadAllText("./Data/statmods.json"));
+            if (statmods is not null)
+            {
+                foreach (var stat in statmods)
+                {
+                    if(int.TryParse(stat.Key, out int val))
+                    {
+                        runeTranslation[val] = stat.Value;
+                    }
+                }
+            }
         }
 
-        public static void EquipPage()
+        public static void EquipPage(YesingRunePage page)
         {
-            var res = LCUClient.Request(LeagueClient.requestMethod.POST, "").Result;
+            var res = LCUClient.Request(LeagueClient.requestMethod.POST, "/lol-perks/v1/pages", page.ToJson()).Result;
             if(res.StartsWith("{\"errorCode\":\""))
             {
                 if(res.Contains("Max pages reached"))
@@ -67,13 +97,70 @@ namespace YesingRunes
                     var currentjson = JsonSerializer.Deserialize<RiotRunePage>(current);
 
                     LCUClient.Request(LeagueClient.requestMethod.DELETE, $"/lol-perks/v1/pages/{currentjson.id}");
-                    res = LCUClient.Request(LeagueClient.requestMethod.POST, "").Result;
-                    if(res.StartsWith("{\"errorCode\":\""))
-                    {
-                        throw new Exception("ur doomed lol");
-                    }
+                    LCUClient.Request(LeagueClient.requestMethod.POST, "/lol-perks/v1/pages", page.ToJson());
                 }
             }
+        }
+
+        public static void DownloadCurrentRunePages()
+        {
+            var res = LCUClient.Request(LeagueClient.requestMethod.GET, "/lol-perks/v1/pages").Result;
+            var pages = JsonSerializer.Deserialize<List<RiotRunePage>>(res);
+            if (pages is not null)
+            {
+                foreach (var page in pages)
+                {
+                    var yes = page.Yesified;
+
+                    File.WriteAllText($"{LocalAppdata}/Pages/{yes.PageID}.json", JsonSerializer.Serialize(yes));
+                }
+            }
+        }
+
+        public static void ImportLocalRunePages()
+        {
+            foreach (var file in Directory.GetFiles($"{LocalAppdata}/Pages/"))
+            {
+                runePages.Add(JsonSerializer.Deserialize<YesingRunePage>(File.ReadAllText(file)));
+            }
+        }
+
+        public static void SaveRunes()
+        {
+            foreach (var page in runePages)
+            {
+                File.WriteAllText($"{LocalAppdata}/Pages/{page.PageID}.json", JsonSerializer.Serialize(page));
+            }
+        }
+
+        public static bool IsValidID(long id)
+        {
+            foreach (var page in runePages)
+            {
+                if (page.PageID == id) return false;
+            }
+            foreach (var file in Directory.GetFiles($"{LocalAppdata}/Pages/"))
+            {
+                if (Path.GetFileNameWithoutExtension(file) == id.ToString()) return false; 
+            }
+            return true;
+        }
+
+        public static Random rand = new Random(DateTime.Now.Millisecond);
+        public static long GenerateID()
+        {
+            return rand.NextInt64();
+        }
+
+        public static long GenerateValidID()
+        {
+            long val = GenerateID();
+            while (!IsValidID(val))
+            {
+                if (IsValidID(val)) return val;
+                val = GenerateID();
+            }
+            return val;
         }
     }
 }

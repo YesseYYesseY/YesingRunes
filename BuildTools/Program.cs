@@ -1,9 +1,13 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
+using System.Xml.Linq;
 using YesingRunes.Models;
 
 const string DateFormat = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
 
 Directory.CreateDirectory("./Data/Images/Champs/");
+Directory.CreateDirectory("./Data/Images/Runes/");
 
 string lang = "en_US";
 
@@ -14,12 +18,12 @@ if(args.Length > 0)
 
 using (var client = new HttpClient())
 {
-    if(!client.DownloadFile("https://ddragon.leagueoflegends.com/api/versions.json", "./Data/versions.json")) throw new FileNotFoundException("./Data/versions.json does not exist!");
+    if (!client.DownloadFile("https://ddragon.leagueoflegends.com/api/versions.json", "./Data/versions.json")) throw new FileNotFoundException("./Data/versions.json does not exist!");
 
     var versions = JsonSerializer.Deserialize<string[]>(File.ReadAllText("./Data/versions.json"));
-    
+
     string version = "12.23.1"; // default
-    if(versions is not null &&
+    if (versions is not null &&
        versions.Length > 0)
     {
         version = versions[0];
@@ -28,11 +32,51 @@ using (var client = new HttpClient())
     File.Create("./Data/version.json").Close();
     File.WriteAllText("./Data/version.json", version);
 
-    if (!client.DownloadFile($"http://ddragon.leagueoflegends.com/cdn/{version}/data/{lang}/champion.json", "./Data/champion.json")) throw new FileNotFoundException("./Data/champion.json does not exist!");
     if (!client.DownloadFile($"http://ddragon.leagueoflegends.com/cdn/{version}/data/{lang}/runesReforged.json", "./Data/runes.json")) throw new FileNotFoundException("./Data/runes.json does not exist!");
+    var options = new JsonSerializerOptions
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    // Data Dragon has no data for StatMods, only images :/
+    File.WriteAllText("./Data/statmods.json", JsonSerializer.Serialize(new Dictionary<string, object>
+    {
+        { "5001", new { name = "Health Scaling", description = "+15-140 Health (based on level)" } },
+        { "5002", new { name = "Armor",          description = "+6 Armor" } },
+        { "5003", new { name = "Magic Resist",   description = "+8 Magic Resist" } },
+        { "5005", new { name = "Attack Speed",   description = "+10% Attack Speed" } },
+        { "5007", new { name = "Ability Haste",  description = "+8 Ability Haste" } },
+        { "5008", new { name = "Adaptive Force", description = "+9 Adaptive Force" } }
+    }, options));
+
+    var runesjson = JsonSerializer.Deserialize<RiotRunePath[]>(File.ReadAllText("./Data/runes.json"));
+    Dictionary<string, string> downloads = new Dictionary<string, string>()
+    {
+        { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsHealthScalingIcon.png",            "./Data/Images/Runes/5001.png" },
+        { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsArmorIcon.png",                    "./Data/Images/Runes/5002.png" },
+        { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsMagicResIcon.MagicResist_Fix.png", "./Data/Images/Runes/5003.png" },
+        { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAttackSpeedIcon.png",              "./Data/Images/Runes/5005.png" },
+        { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png",               "./Data/Images/Runes/5007.png" },
+        { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png",            "./Data/Images/Runes/5008.png" },
+    };
+    if (runesjson is not null)
+    {
+        foreach (var runepath in runesjson)
+        {
+            downloads.Add($"http://ddragon.leagueoflegends.com/cdn/img/{runepath.icon}", $"./Data/Images/Runes/{runepath.id}.png");
+            foreach (var runeslot in runepath.slots)
+            {
+                foreach (var rune in runeslot.runes)
+                {
+                    downloads.Add($"http://ddragon.leagueoflegends.com/cdn/img/{rune.icon}", $"./Data/Images/Runes/{rune.id}.png");
+                }
+            }
+        }
+    }
+
+    if (!client.DownloadFile($"http://ddragon.leagueoflegends.com/cdn/{version}/data/{lang}/champion.json", "./Data/champion.json")) throw new FileNotFoundException("./Data/champion.json does not exist!");
 
     var championjson = JsonSerializer.Deserialize<OuterChampion>(File.ReadAllText("./Data/champion.json"));
-    Dictionary<string, string> downloads = new Dictionary<string, string>();
     foreach (var champ in championjson.data)
     {
         downloads.Add($"http://ddragon.leagueoflegends.com/cdn/12.23.1/img/champion/{champ.Value.image.full}", $"./Data/Images/Champs/{champ.Value.image.full}");

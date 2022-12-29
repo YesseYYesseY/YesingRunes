@@ -7,13 +7,14 @@
         mc:Ignorable="d"
         Title="DownloadAssetsWindow" Height="450" Width="800">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock Text="A new update of League of Legends has been detected!" Name="UpdateText" FontSize="20"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Text="Do you want to update to version " FontSize="20"/>
-            <TextBlock Text="12.23.1" FontSize="20" Name="VersionText"/>
-            <TextBlock Text="?" FontSize="20"/>
-        </StackPanel>
+        <TextBlock HorizontalAlignment="Center" Text="A new update of League of Legends has been detected!" Name="UpdateText" FontSize="20"/>
+        <TextBlock Text="Language:" HorizontalAlignment="Center" FontSize="20"/>
         <ComboBox Margin="5" Height="50" Name="LangCombo" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" SelectedIndex="0"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock x:Name="QuestionBlock" Text="Do you want to update to version " FontSize="20"/>
+            <TextBlock Text="12.23.1" FontSize="20" Name="VersionText"/>
+            <TextBlock x:Name="QuestionmarkBlock" Text="?" FontSize="20"/>
+        </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="Yes" FontSize="20" Width="150" Height="50" Margin="5" Name="AcceptButton" Click="AcceptButton_Click"/>
             <Button Content="No" FontSize="20" Width="150" Height="50" Margin="5" Name="DeclineButton" Click="DeclineButton_Click"/>

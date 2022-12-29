@@ -26,15 +26,22 @@ namespace YesingRunes
         {
             InitializeComponent();
 
-            for (int i = 0; i < 10; i++)
-            {
-                var page = new YesingRunePage()
-                {
-                    Name = "Aatrox"
-                };
+            Closing += MainWindow_Closing;
 
+            RefreshPreviews();
+        }
+
+        void RefreshPreviews()
+        {
+            foreach (var page in Utils.runePages)
+            {
                 PreviewPanel.Children.Add(new RunePreview(page));
             }
+        }
+
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Utils.SaveRunes();
         }
     }
 }

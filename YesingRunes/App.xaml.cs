@@ -18,12 +18,14 @@ namespace YesingRunes
     /// </summary>
     public partial class App : Application
     {
+        DownloadAssetsWindow? assets = null;
         public App()
         {
+            Directory.CreateDirectory($"{Utils.LocalAppdata}/Pages/");
             string newVer = "";
             var processes = Process.GetProcessesByName("YesingRunes");
             if (processes.Length > 1) Environment.Exit(0);
-            DownloadAssetsWindow? assets = null;
+            
             if (File.Exists(Directory.GetCurrentDirectory() + "./Data/version.json"))
             {
                 var client = new HttpClient();
@@ -54,6 +56,11 @@ namespace YesingRunes
         void ShowMainWindow()
         {
             Utils.Init();
+            if(assets is not null && assets.DownloadLCURunes)
+            {
+                Utils.DownloadCurrentRunePages();
+            }
+            Utils.ImportLocalRunePages();
             new MainWindow().Show();
         }
         private void ClosingAssets(object sender, CancelEventArgs e)
