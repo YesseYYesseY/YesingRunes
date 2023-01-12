@@ -1,7 +1,5 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
-using System.Xml.Linq;
 using YesingRunes.Models;
 
 const string DateFormat = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
@@ -10,6 +8,7 @@ Directory.CreateDirectory("./Data/Images/Champs/");
 Directory.CreateDirectory("./Data/Images/Runes/");
 
 string lang = "en_US";
+string version = "12.23.1";
 
 if(args.Length > 0)
 {
@@ -18,11 +17,8 @@ if(args.Length > 0)
 
 using (var client = new HttpClient())
 {
-    if (!client.DownloadFile("https://ddragon.leagueoflegends.com/api/versions.json", "./Data/versions.json")) throw new FileNotFoundException("./Data/versions.json does not exist!");
+    var versions = client.DownloadAndDeserialize<string[]>("https://ddragon.leagueoflegends.com/api/versions.json", "./Data/versions.json");
 
-    var versions = JsonSerializer.Deserialize<string[]>(File.ReadAllText("./Data/versions.json"));
-
-    string version = "12.23.1"; // default
     if (versions is not null &&
        versions.Length > 0)
     {
@@ -32,13 +28,13 @@ using (var client = new HttpClient())
     File.Create("./Data/version.json").Close();
     File.WriteAllText("./Data/version.json", version);
 
-    if (!client.DownloadFile($"http://ddragon.leagueoflegends.com/cdn/{version}/data/{lang}/runesReforged.json", "./Data/runes.json")) throw new FileNotFoundException("./Data/runes.json does not exist!");
+    var runesjson = client.DownloadAndDeserialize<RiotRunePath[]>($"http://ddragon.leagueoflegends.com/cdn/{version}/data/{lang}/runesReforged.json", "./Data/runes.json");
+
+    // Data Dragon has no data for StatMods, only images :/
     var options = new JsonSerializerOptions
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
-
-    // Data Dragon has no data for StatMods, only images :/
     File.WriteAllText("./Data/statmods.json", JsonSerializer.Serialize(new Dictionary<string, object>
     {
         { "5001", new { name = "Health Scaling", description = "+15-140 Health (based on level)" } },
@@ -49,7 +45,6 @@ using (var client = new HttpClient())
         { "5008", new { name = "Adaptive Force", description = "+9 Adaptive Force" } }
     }, options));
 
-    var runesjson = JsonSerializer.Deserialize<RiotRunePath[]>(File.ReadAllText("./Data/runes.json"));
     Dictionary<string, string> downloads = new Dictionary<string, string>()
     {
         { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsHealthScalingIcon.png",            "./Data/Images/Runes/5001.png" },
@@ -59,6 +54,7 @@ using (var client = new HttpClient())
         { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsCDRScalingIcon.png",               "./Data/Images/Runes/5007.png" },
         { "http://ddragon.leagueoflegends.com/cdn/img/perk-images/StatMods/StatModsAdaptiveForceIcon.png",            "./Data/Images/Runes/5008.png" },
     };
+
     if (runesjson is not null)
     {
         foreach (var runepath in runesjson)
@@ -93,7 +89,7 @@ static string GetCurrentTime()
 
 public static class Extensions
 {
-    static string DateFormat = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
+    const string DateFormat = "ddd, dd MMM yyyy HH:mm:ss 'GMT'";
     public static HttpResponseMessage? Get(this HttpClient client, string uri)
     {
         return client.Send(new HttpRequestMessage(HttpMethod.Get, uri));
@@ -129,6 +125,12 @@ public static class Extensions
             }
         }
         return false;
+    }
+
+    public static T? DownloadAndDeserialize<T>(this HttpClient client, string uri, string outPath)
+    {
+        client.DownloadFile(uri, outPath);
+        return JsonSerializer.Deserialize<T>(File.ReadAllText(outPath));
     }
 
     public static void DownloadFiles(this HttpClient client, Dictionary<string, string> uris)

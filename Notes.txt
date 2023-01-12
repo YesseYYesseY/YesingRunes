@@ -1,8 +1,0 @@
-YesingRunes notes
-
-All rune pages will contain this info
- - Name (name of the page) [string]
- - CurrentRunes (currently selected rune ids) [int array]
- - PrimaryRunePath (currently selected primary rune path (left path)) [int]
- - SecondaryRunePath (currently selected secondary rune path (right path)) [int]
-More will get added but these are the current plans

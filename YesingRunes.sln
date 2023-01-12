@@ -5,14 +5,9 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YesingRunes", "YesingRunes\YesingRunes.csproj", "{D3867B54-4C9B-4B8D-B407-8E279B75DACF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6BE31D7F-6748-45C2-8B67-E21EA161A2FC}"
-	ProjectSection(SolutionItems) = preProject
-		Notes.txt = Notes.txt
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildTools", "BuildTools\BuildTools.csproj", "{ACB0F4D7-41B4-42BB-887C-96CEC2D4256F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YesingRunes.Models", "YesingRunes.Models\YesingRunes.Models.csproj", "{DE833BDF-6164-46E1-8563-AF36FA41D6D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YesingRunes.Models", "YesingRunes.Models\YesingRunes.Models.csproj", "{DE833BDF-6164-46E1-8563-AF36FA41D6D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
